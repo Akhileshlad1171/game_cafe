@@ -123,6 +123,10 @@ button:hover {
 .paid {
   border: 2px solid #22c55e;
 }
+.warning {
+  border: 2px solid #facc15;
+  box-shadow: 0 0 15px rgba(250, 204, 21, 0.7);
+}
 
 /* ===== LOG AREA ===== */
 #logArea {
@@ -159,3 +163,4 @@ p {
   font-size: 0.75rem;
   color: #94a3b8;
 }
+

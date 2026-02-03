@@ -1,4 +1,5 @@
 const sessions = {};
+let logs = JSON.parse(localStorage.getItem("levelUpLogs")) || [];
 
 /* ================= LIVE CLOCK ================= */
 function updateLiveClock() {
@@ -25,8 +26,10 @@ function startSession() {
     players: playersEl().value || 1,
     amount: amountEl().value || 0,
     remaining: parseInt(timeEl().value) * 60,
+    totalSeconds: parseInt(timeEl().value) * 60,
     running: true,
-    paid: false
+    paid: false,
+    startTime: new Date()
   };
 
   renderSession(device);
@@ -76,6 +79,7 @@ function formatEndTime(secondsRemaining) {
 function extendTime(device, minutes) {
   if (!sessions[device]) return;
   sessions[device].remaining += minutes * 60;
+  sessions[device].totalSeconds += minutes * 60;
 }
 
 function togglePause(device) {
@@ -88,7 +92,30 @@ function markPaid(device) {
   document.getElementById(device).classList.add("paid");
 }
 
+/* ================= END SESSION + LOG ================= */
+
 function endSession(device) {
+  const s = sessions[device];
+  if (!s) return;
+
+  const endTime = new Date();
+  const playedMinutes = Math.round((s.totalSeconds - s.remaining) / 60);
+
+  const log = {
+    date: endTime.toLocaleDateString(),
+    device: device,
+    customer: s.customer,
+    players: s.players,
+    startTime: s.startTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+    endTime: endTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+    minutes: playedMinutes,
+    amount: s.amount,
+    paid: s.paid ? "Yes" : "No"
+  };
+
+  logs.push(log);
+  localStorage.setItem("levelUpLogs", JSON.stringify(logs));
+
   delete sessions[device];
   document.getElementById(device).remove();
 }
@@ -122,6 +149,76 @@ setInterval(() => {
     }
   }
 }, 1000);
+
+/* ================= DAILY LOG ================= */
+
+function showTodayLog() {
+  const today = new Date().toLocaleDateString();
+  const todayLogs = logs.filter(l => l.date === today);
+
+  let total = 0;
+  let html = `
+    <h3>📜 Today’s Log</h3>
+    <table border="1" cellpadding="5" style="margin:auto;">
+      <tr>
+        <th>Device</th>
+        <th>Customer</th>
+        <th>Players</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Minutes</th>
+        <th>Amount</th>
+        <th>Paid</th>
+      </tr>
+  `;
+
+  todayLogs.forEach(l => {
+    total += Number(l.amount);
+    html += `
+      <tr>
+        <td>${l.device}</td>
+        <td>${l.customer}</td>
+        <td>${l.players}</td>
+        <td>${l.startTime}</td>
+        <td>${l.endTime}</td>
+        <td>${l.minutes}</td>
+        <td>₹${l.amount}</td>
+        <td>${l.paid}</td>
+      </tr>
+    `;
+  });
+
+  html += `
+    </table>
+    <h4>💰 Total: ₹${total}</h4>
+  `;
+
+  document.getElementById("logArea").innerHTML = html;
+  document.getElementById("logArea").style.display = "block";
+}
+
+function downloadLog() {
+  if (logs.length === 0) {
+    alert("No logs available");
+    return;
+  }
+
+  let csv = "Date,Device,Customer,Players,Start,End,Minutes,Amount,Paid\n";
+
+  logs.forEach(l => {
+    csv += `${l.date},${l.device},${l.customer},${l.players},${l.startTime},${l.endTime},${l.minutes},${l.amount},${l.paid}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "LevelUpGaming_DailyLog.csv";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
 
 /* ================= DOM SHORTCUTS ================= */
 const customerEl = () => document.getElementById("customer");

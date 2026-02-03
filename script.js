@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+/* ================= DOM HELPERS (MISSING EARLIER) ================= */
+function customerEl() { return document.getElementById("customer"); }
+function playersEl() { return document.getElementById("players"); }
+function deviceEl()   { return document.getElementById("device"); }
+function timeEl()     { return document.getElementById("time"); }
+function amountEl()   { return document.getElementById("amount"); }
+
 const sessions = {};
 let logs = JSON.parse(localStorage.getItem("levelUpLogs")) || [];
 
@@ -120,10 +127,15 @@ setInterval(() => {
     if (s.running && s.remaining > 0) s.remaining--;
 
     div.querySelector(".time").innerText =
-      s.remaining > 0 ? `⏳ ${Math.floor(s.remaining/60)}m ${s.remaining%60}s` : "⛔ Time Over";
+      s.remaining > 0
+        ? `⏳ ${Math.floor(s.remaining/60)}m ${s.remaining%60}s`
+        : "⛔ Time Over";
 
     div.querySelector(".endTime").innerText =
-      s.remaining > 0 ? `⏰ Ends at: ${new Date(Date.now()+s.remaining*1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}` : "";
+      s.remaining > 0
+        ? `⏰ Ends at: ${new Date(Date.now()+s.remaining*1000)
+            .toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`
+        : "";
   }
 }, 1000);
 
@@ -135,12 +147,21 @@ window.showTodayLog = function () {
 
   let total = 0;
   let html = `<h3>📜 Today’s Log</h3><table><tr>
-  <th>Device</th><th>Customer</th><th>Players</th><th>Start</th><th>End</th><th>Min</th><th>₹</th><th>Paid</th></tr>`;
+  <th>Device</th><th>Customer</th><th>Players</th><th>Start</th>
+  <th>End</th><th>Min</th><th>₹</th><th>Paid</th></tr>`;
 
   todayLogs.forEach(l => {
     total += Number(l.amount);
-    html += `<tr><td>${l.device}</td><td>${l.customer}</td><td>${l.players}</td>
-    <td>${l.startTime}</td><td>${l.endTime}</td><td>${l.minutes}</td><td>${l.amount}</td><td>${l.paid}</td></tr>`;
+    html += `<tr>
+      <td>${l.device}</td>
+      <td>${l.customer}</td>
+      <td>${l.players}</td>
+      <td>${l.startTime}</td>
+      <td>${l.endTime}</td>
+      <td>${l.minutes}</td>
+      <td>${l.amount}</td>
+      <td>${l.paid}</td>
+    </tr>`;
   });
 
   html += `</table><h4>Total: ₹${total}</h4>`;
@@ -156,6 +177,11 @@ window.downloadLog = function () {
   a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
   a.download = "LevelUpGaming_Log.csv";
   a.click();
+};
+
+window.closeLog = function () {
+  document.getElementById("logArea").style.display = "none";
+  document.getElementById("logArea").innerHTML = "";
 };
 
 });

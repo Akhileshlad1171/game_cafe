@@ -1,5 +1,21 @@
 const sessions = {};
 
+/* ================= LIVE CLOCK ================= */
+function updateLiveClock() {
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const day = now.toLocaleDateString([], { weekday: 'long' });
+  const date = now.toLocaleDateString([], { day: '2-digit', month: 'short', year: 'numeric' });
+
+  document.getElementById("liveClock").innerText =
+    `🕒 ${time} | ${day} | ${date}`;
+}
+
+setInterval(updateLiveClock, 1000);
+updateLiveClock();
+
+/* ================= SESSIONS ================= */
+
 function startSession() {
   const device = deviceEl().value;
   if (sessions[device]) return alert("Session already running!");
@@ -27,7 +43,10 @@ function renderSession(device) {
     <h3>${device}</h3>
     <p>👤 ${s.customer}</p>
     <p>🎮 Players: ${s.players}</p>
+
     <p class="time"></p>
+    <p class="endTime"></p>
+
     <p>💰 ₹${s.amount}</p>
 
     <button class="small-btn" onclick="togglePause('${device}')">
@@ -40,19 +59,20 @@ function renderSession(device) {
       <button class="small-btn" onclick="extendTime('${device}', 120)">+2h</button>
     </div>
 
-    <button class="small-btn" onclick="markPaid('${device}')">
-      💰 Mark Paid
-    </button>
-
-    <button class="small-btn" onclick="endSession('${device}')">
-      ❌ End
-    </button>
+    <button class="small-btn" onclick="markPaid('${device}')">💰 Mark Paid</button>
+    <button class="small-btn" onclick="endSession('${device}')">❌ End</button>
   `;
 
   document.getElementById("sessions").appendChild(div);
 }
 
-/* 🔥 NEW FUNCTION */
+/* ================= HELPERS ================= */
+
+function formatEndTime(secondsRemaining) {
+  const end = new Date(Date.now() + secondsRemaining * 1000);
+  return end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 function extendTime(device, minutes) {
   if (!sessions[device]) return;
   sessions[device].remaining += minutes * 60;
@@ -73,6 +93,8 @@ function endSession(device) {
   document.getElementById(device).remove();
 }
 
+/* ================= TIMER LOOP ================= */
+
 setInterval(() => {
   for (let device in sessions) {
     const s = sessions[device];
@@ -87,8 +109,13 @@ setInterval(() => {
 
     div.querySelector(".time").innerText =
       s.remaining > 0
-        ? `⏳ ${min}m ${sec}s`
+        ? `⏳ ${min}m ${sec}s remaining`
         : "⛔ Time Over";
+
+    div.querySelector(".endTime").innerText =
+      s.remaining > 0
+        ? `⏰ Ends at: ${formatEndTime(s.remaining)}`
+        : "";
 
     if (s.remaining <= 0) {
       div.classList.add("expired");
@@ -96,7 +123,7 @@ setInterval(() => {
   }
 }, 1000);
 
-/* helpers */
+/* ================= DOM SHORTCUTS ================= */
 const customerEl = () => document.getElementById("customer");
 const playersEl = () => document.getElementById("players");
 const deviceEl = () => document.getElementById("device");

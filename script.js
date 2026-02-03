@@ -12,6 +12,7 @@ function startSession() {
     running: true,
     paid: false
   };
+
   renderSession(device);
 }
 
@@ -30,19 +31,31 @@ function renderSession(device) {
     <p>💰 ₹${s.amount}</p>
 
     <button class="small-btn" onclick="togglePause('${device}')">
-      Pause / Resume
+      ⏸ Pause / ▶ Resume
     </button>
 
+    <div>
+      <button class="small-btn" onclick="extendTime('${device}', 30)">+30m</button>
+      <button class="small-btn" onclick="extendTime('${device}', 60)">+1h</button>
+      <button class="small-btn" onclick="extendTime('${device}', 120)">+2h</button>
+    </div>
+
     <button class="small-btn" onclick="markPaid('${device}')">
-      Mark Paid
+      💰 Mark Paid
     </button>
 
     <button class="small-btn" onclick="endSession('${device}')">
-      End
+      ❌ End
     </button>
   `;
 
   document.getElementById("sessions").appendChild(div);
+}
+
+/* 🔥 NEW FUNCTION */
+function extendTime(device, minutes) {
+  if (!sessions[device]) return;
+  sessions[device].remaining += minutes * 60;
 }
 
 function togglePause(device) {
@@ -71,10 +84,15 @@ setInterval(() => {
 
     const min = Math.floor(s.remaining / 60);
     const sec = s.remaining % 60;
-    div.querySelector(".time").innerText =
-      s.remaining > 0 ? `⏳ ${min}m ${sec}s` : "⛔ Time Over";
 
-    if (s.remaining <= 0) div.classList.add("expired");
+    div.querySelector(".time").innerText =
+      s.remaining > 0
+        ? `⏳ ${min}m ${sec}s`
+        : "⛔ Time Over";
+
+    if (s.remaining <= 0) {
+      div.classList.add("expired");
+    }
   }
 }, 1000);
 
@@ -84,5 +102,3 @@ const playersEl = () => document.getElementById("players");
 const deviceEl = () => document.getElementById("device");
 const timeEl = () => document.getElementById("time");
 const amountEl = () => document.getElementById("amount");
-
-

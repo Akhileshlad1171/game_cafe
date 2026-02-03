@@ -43,7 +43,7 @@ window.startSession = function () {
     totalSeconds: parseInt(timeEl().value) * 60,
     running: true,
     paid: false,
-    warned: false, // 🔔 warning flag
+    warned: false,
     startTime: new Date()
   };
 
@@ -98,7 +98,10 @@ window.editAmount = function (device) {
   }
 
   s.amount = value;
-  document.querySelector(`#${device} .amount`).innerText = `💰 ₹${s.amount}`;
+
+  // ✅ SAFE UPDATE
+  const sessionDiv = document.getElementById(device);
+  sessionDiv.querySelector(".amount").innerText = `💰 ₹${s.amount}`;
 };
 
 window.extendTime = function (device, minutes) {
@@ -113,7 +116,9 @@ window.extendTime = function (device, minutes) {
     const val = Number(extra);
     if (!isNaN(val) && val >= 0) {
       s.amount += val;
-      document.querySelector(`#${device} .amount`).innerText = `💰 ₹${s.amount}`;
+
+      const sessionDiv = document.getElementById(device);
+      sessionDiv.querySelector(".amount").innerText = `💰 ₹${s.amount}`;
     }
   }
 };
@@ -170,7 +175,6 @@ setInterval(() => {
             .toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`
         : "";
 
-    // 🔔 5 MIN WARNING
     if (s.remaining <= 300 && s.remaining > 0 && !s.warned) {
       s.warned = true;
       div.classList.add("warning");
@@ -208,6 +212,8 @@ window.showTodayLog = function () {
   });
 
   html += `</table><h4 style="text-align:center;">💰 Total: ₹${total}</h4>`;
+
+  const logArea = document.getElementById("logArea");
   logArea.innerHTML = html;
   logArea.style.display = "block";
 };
@@ -233,11 +239,14 @@ window.clearLog = function () {
   if (!confirm("Are you sure you want to clear ALL today's logs?")) return;
   logs = [];
   localStorage.setItem("levelUpLogs", JSON.stringify([]));
-  logArea.innerHTML = "<h3>🧹 Logs Cleared</h3>";
+
+  const logArea = document.getElementById("logArea");
+  logArea.innerHTML = "<h3 style='text-align:center;'>🧹 Logs Cleared</h3>";
   logArea.style.display = "block";
 };
 
 window.closeLog = function () {
+  const logArea = document.getElementById("logArea");
   logArea.style.display = "none";
   logArea.innerHTML = "";
 };

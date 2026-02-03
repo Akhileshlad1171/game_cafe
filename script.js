@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-/* ================= DOM HELPERS (MISSING EARLIER) ================= */
+/* ================= DOM HELPERS ================= */
 function customerEl() { return document.getElementById("customer"); }
 function playersEl() { return document.getElementById("players"); }
-function deviceEl()   { return document.getElementById("device"); }
-function timeEl()     { return document.getElementById("time"); }
-function amountEl()   { return document.getElementById("amount"); }
+function deviceEl()  { return document.getElementById("device"); }
+function timeEl()    { return document.getElementById("time"); }
+function amountEl()  { return document.getElementById("amount"); }
 
 const sessions = {};
 let logs = JSON.parse(localStorage.getItem("levelUpLogs")) || [];
@@ -147,8 +147,8 @@ window.showTodayLog = function () {
 
   let total = 0;
   let html = `<h3>📜 Today’s Log</h3><table><tr>
-  <th>Device</th><th>Customer</th><th>Players</th><th>Start</th>
-  <th>End</th><th>Min</th><th>₹</th><th>Paid</th></tr>`;
+    <th>Device</th><th>Customer</th><th>Players</th><th>Start</th>
+    <th>End</th><th>Min</th><th>₹</th><th>Paid</th></tr>`;
 
   todayLogs.forEach(l => {
     total += Number(l.amount);
@@ -170,6 +170,11 @@ window.showTodayLog = function () {
 };
 
 window.downloadLog = function () {
+  if (logs.length === 0) {
+    alert("No logs available");
+    return;
+  }
+
   let csv = "Date,Device,Customer,Players,Start,End,Minutes,Amount,Paid\n";
   logs.forEach(l => csv += Object.values(l).join(",") + "\n");
 
@@ -177,6 +182,21 @@ window.downloadLog = function () {
   a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
   a.download = "LevelUpGaming_Log.csv";
   a.click();
+};
+
+/* 🔥 NEW FEATURE: CLEAR LOG */
+window.clearLog = function () {
+  if (!confirm("Are you sure you want to clear ALL today's logs?")) return;
+
+  logs = [];
+  localStorage.removeItem("levelUpLogs");
+
+  const logArea = document.getElementById("logArea");
+  logArea.innerHTML = `
+    <h3 style="color:#22c55e;">🧹 Logs Cleared</h3>
+    <p>No records for today.</p>
+  `;
+  logArea.style.display = "block";
 };
 
 window.closeLog = function () {

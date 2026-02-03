@@ -1,44 +1,88 @@
 const sessions = {};
 
-function startTimer() {
-  const device = document.getElementById("device").value;
-  const minutes = parseInt(document.getElementById("time").value);
+function startSession() {
+  const device = deviceEl().value;
+  if (sessions[device]) return alert("Session already running!");
 
-  if (sessions[device]) return alert("Timer already running!");
+  sessions[device] = {
+    customer: customerEl().value || "Guest",
+    players: playersEl().value || 1,
+    amount: amountEl().value || 0,
+    remaining: parseInt(timeEl().value) * 60,
+    running: true,
+    paid: false
+  };
 
-  const endTime = Date.now() + minutes * 60000;
-  sessions[device] = endTime;
+  renderSession(device);
+}
+
+function renderSession(device) {
+  const s = sessions[device];
 
   const div = document.createElement("div");
   div.className = "session";
   div.id = device;
+
   div.innerHTML = `
     <h3>${device}</h3>
-    <p class="time">Loading...</p>
-    <button onclick="stopTimer('${device}')">Stop</button>
+    <p>👤 ${s.customer}</p>
+    <p>🎮 Players: ${s.players}</p>
+    <p class="time"></p>
+    <p>💰 ₹${s.amount}</p>
+
+    <button class="small-btn" onclick="togglePause('${device}')">
+      Pause / Resume
+    </button>
+
+    <button class="small-btn" onclick="markPaid('${device}')">
+      Mark Paid
+    </button>
+
+    <button class="small-btn" onclick="endSession('${device}')">
+      End
+    </button>
   `;
 
   document.getElementById("sessions").appendChild(div);
 }
 
-function stopTimer(device) {
+function togglePause(device) {
+  sessions[device].running = !sessions[device].running;
+  document.getElementById(device).classList.toggle("paused");
+}
+
+function markPaid(device) {
+  sessions[device].paid = true;
+  document.getElementById(device).classList.add("paid");
+}
+
+function endSession(device) {
   delete sessions[device];
   document.getElementById(device).remove();
 }
 
 setInterval(() => {
   for (let device in sessions) {
-    const remaining = sessions[device] - Date.now();
+    const s = sessions[device];
     const div = document.getElementById(device);
 
-    if (remaining <= 0) {
-      div.classList.add("expired");
-      div.querySelector(".time").innerText = "Time Over!";
-    } else {
-      const min = Math.floor(remaining / 60000);
-      const sec = Math.floor((remaining % 60000) / 1000);
-      div.querySelector(".time").innerText =
-        `${min}m ${sec}s remaining`;
+    if (s.running && s.remaining > 0) {
+      s.remaining--;
     }
+
+    const min = Math.floor(s.remaining / 60);
+    const sec = s.remaining % 60;
+    div.querySelector(".time").innerText =
+      s.remaining > 0 ? `⏳ ${min}m ${sec}s` : "⛔ Time Over";
+
+    if (s.remaining <= 0) div.classList.add("expired");
   }
 }, 1000);
+
+/* helpers */
+const customerEl = () => document.getElementById("customer");
+const playersEl = () => document.getElementById("players");
+const deviceEl = () => document.getElementById("device");
+const timeEl = () => document.getElementById("time");
+const amountEl = () => document.getElementById("amount");
+

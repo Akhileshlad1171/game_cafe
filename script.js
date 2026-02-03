@@ -62,7 +62,11 @@ function renderSession(device) {
     <p>🎮 Players: ${s.players}</p>
     <p class="time"></p>
     <p class="endTime"></p>
-    <p>💰 ₹${s.amount}</p>
+   <p class="amount">💰 ₹${s.amount}</p>
+
+<button class="small-btn" onclick="editAmount('${device}')">
+  ✏️ Edit Amount
+</button>
 
     <button class="small-btn" onclick="togglePause('${device}')">⏸ Pause / ▶ Resume</button>
 
@@ -213,3 +217,4 @@ window.closeLog = function () {
 };
 
 });
+

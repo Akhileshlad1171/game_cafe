@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <div id="liveClock" style="margin-bottom:10px; font-size:14px; opacity:0.9;"></div>
   <title>Level Up Gaming – Manager</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <h1>🎮 LEVEL UP GAMING</h1>
 
+<!-- LIVE CLOCK -->
+<div id="liveClock" style="margin-bottom:10px; font-size:14px; opacity:0.9;"></div>
+
+<!-- CONTROLS -->
 <div id="controls">
- 
-  <button onclick="showTodayLog()">📜 View Today Log</button>
-<button onclick="downloadLog()">⬇️ Download Log</button>
-   <div id="logArea" style="display:none; margin-top:20px;"></div>
+
   <input id="customer" placeholder="Customer Name">
 
   <input id="players" type="number" placeholder="Players" min="1">
@@ -45,11 +46,25 @@
 
 <hr style="width:80%; opacity:0.3;">
 
+<!-- LOG CONTROLS -->
+<div style="margin:15px;">
+  <button onclick="showTodayLog()">📜 View Today Log</button>
+  <button onclick="downloadLog()">⬇️ Download Log</button>
+</div>
+
+<!-- LOG AREA -->
+<div id="logArea" style="display:none; margin:20px;"></div>
+
+<!-- ACTIVE SESSIONS -->
 <div id="sessions"></div>
+
+<hr style="width:80%; opacity:0.3;">
+
+<!-- FOOTER -->
+<p style="font-size:12px; opacity:0.6; margin-top:20px;">
+  Made by Akhilesh · All rights reserved
+</p>
 
 <script src="script.js"></script>
 </body>
 </html>
-
-
-

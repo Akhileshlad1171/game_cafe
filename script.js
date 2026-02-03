@@ -1,6 +1,11 @@
 const sessions = {};
 let logs = JSON.parse(localStorage.getItem("levelUpLogs")) || [];
 
+/* ================= AUTO CLEAR OLD LOGS ================= */
+const todayDate = new Date().toLocaleDateString();
+logs = logs.filter(log => log.date === todayDate);
+localStorage.setItem("levelUpLogs", JSON.stringify(logs));
+
 /* ================= LIVE CLOCK ================= */
 function updateLiveClock() {
   const now = new Date();
@@ -197,6 +202,12 @@ function showTodayLog() {
   document.getElementById("logArea").style.display = "block";
 }
 
+function closeLog() {
+  const logArea = document.getElementById("logArea");
+  logArea.style.display = "none";
+  logArea.innerHTML = "";
+}
+
 function downloadLog() {
   if (logs.length === 0) {
     alert("No logs available");
@@ -205,24 +216,4 @@ function downloadLog() {
 
   let csv = "Date,Device,Customer,Players,Start,End,Minutes,Amount,Paid\n";
 
-  logs.forEach(l => {
-    csv += `${l.date},${l.device},${l.customer},${l.players},${l.startTime},${l.endTime},${l.minutes},${l.amount},${l.paid}\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "LevelUpGaming_DailyLog.csv";
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-
-/* ================= DOM SHORTCUTS ================= */
-const customerEl = () => document.getElementById("customer");
-const playersEl = () => document.getElementById("players");
-const deviceEl = () => document.getElementById("device");
-const timeEl = () => document.getElementById("time");
-const amountEl = () => document.getElementById("amount");
+  logs

@@ -12,7 +12,6 @@ function startSession() {
     running: true,
     paid: false
   };
-
   renderSession(device);
 }
 
@@ -85,4 +84,5 @@ const playersEl = () => document.getElementById("players");
 const deviceEl = () => document.getElementById("device");
 const timeEl = () => document.getElementById("time");
 const amountEl = () => document.getElementById("amount");
+
 

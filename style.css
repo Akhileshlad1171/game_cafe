@@ -1,42 +1,161 @@
+/* ===== GLOBAL ===== */
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: radial-gradient(circle at top, #0f2027, #020617);
+  color: #e5e7eb;
   text-align: center;
+  margin: 0;
+  min-height: 100vh;
 }
 
-h1 { color: #38bdf8; }
-
-#controls input, #controls select, #controls button {
-  padding: 8px;
-  margin: 5px;
+/* ===== HEADER ===== */
+h1 {
+  color: #22c55e;
+  letter-spacing: 2px;
+  margin-top: 20px;
 }
 
+/* ===== LIVE CLOCK ===== */
+#liveClock {
+  color: #38bdf8;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+/* ===== CONTROLS ===== */
+#controls {
+  background: #020617;
+  padding: 15px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.25);
+}
+
+#controls input,
+#controls select {
+  padding: 10px;
+  margin: 6px;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+#controls input::placeholder {
+  color: #94a3b8;
+}
+
+/* ===== BUTTONS ===== */
 button {
-  cursor: pointer;
+  padding: 10px 14px;
+  margin: 6px;
+  border-radius: 10px;
   border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #020617;
+  transition: all 0.2s ease;
 }
 
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+}
+
+.small-btn {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  margin: 4px;
+}
+
+/* ===== SESSIONS GRID ===== */
 #sessions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 20px;
 }
 
+/* ===== SESSION CARD ===== */
 .session {
-  background: #1e293b;
+  background: linear-gradient(145deg, #020617, #020617);
   padding: 15px;
-  margin: 10px;
-  width: 240px;
-  border-radius: 10px;
+  margin: 12px;
+  width: 260px;
+  border-radius: 16px;
+  box-shadow:
+    0 0 15px rgba(56, 189, 248, 0.15),
+    inset 0 0 10px rgba(0, 0, 0, 0.8);
+  transition: transform 0.2s ease;
 }
 
-.paused { background: #a16207; }
-.expired { background: #dc2626; }
-.paid { border: 2px solid #22c55e; }
-
-.small-btn {
-  margin: 3px;
-  padding: 5px;
+.session:hover {
+  transform: translateY(-4px);
 }
 
+.session h3 {
+  color: #38bdf8;
+  margin-bottom: 5px;
+}
+
+.session p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+/* ===== STATES ===== */
+.paused {
+  border: 2px solid #facc15;
+}
+
+.expired {
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+.paid {
+  border: 2px solid #22c55e;
+}
+
+/* ===== LOG AREA ===== */
+#logArea {
+  margin: 20px auto;
+  max-width: 95%;
+  background: #020617;
+  padding: 15px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+}
+
+/* ===== LOG TABLE ===== */
+#logArea table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#logArea th,
+#logArea td {
+  border: 1px solid #1f2937;
+  padding: 8px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+#logArea th {
+  color: #38bdf8;
+  background: #020617;
+}
+
+/* ===== FOOTER ===== */
+p {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}

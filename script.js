@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 const sessions = {};
 let logs = JSON.parse(localStorage.getItem("levelUpLogs")) || [];
 
@@ -22,7 +24,7 @@ updateLiveClock();
 
 /* ================= SESSIONS ================= */
 
-function startSession() {
+window.startSession = function () {
   const device = deviceEl().value;
   if (sessions[device]) return alert("Session already running!");
 
@@ -38,7 +40,7 @@ function startSession() {
   };
 
   renderSession(device);
-}
+};
 
 function renderSession(device) {
   const s = sessions[device];
@@ -51,15 +53,11 @@ function renderSession(device) {
     <h3>${device}</h3>
     <p>👤 ${s.customer}</p>
     <p>🎮 Players: ${s.players}</p>
-
     <p class="time"></p>
     <p class="endTime"></p>
-
     <p>💰 ₹${s.amount}</p>
 
-    <button class="small-btn" onclick="togglePause('${device}')">
-      ⏸ Pause / ▶ Resume
-    </button>
+    <button class="small-btn" onclick="togglePause('${device}')">⏸ Pause / ▶ Resume</button>
 
     <div>
       <button class="small-btn" onclick="extendTime('${device}', 30)">+30m</button>
@@ -76,144 +74,88 @@ function renderSession(device) {
 
 /* ================= HELPERS ================= */
 
-function formatEndTime(secondsRemaining) {
-  const end = new Date(Date.now() + secondsRemaining * 1000);
-  return end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function extendTime(device, minutes) {
-  if (!sessions[device]) return;
+window.extendTime = function (device, minutes) {
   sessions[device].remaining += minutes * 60;
   sessions[device].totalSeconds += minutes * 60;
-}
+};
 
-function togglePause(device) {
+window.togglePause = function (device) {
   sessions[device].running = !sessions[device].running;
   document.getElementById(device).classList.toggle("paused");
-}
+};
 
-function markPaid(device) {
+window.markPaid = function (device) {
   sessions[device].paid = true;
   document.getElementById(device).classList.add("paid");
-}
+};
 
-/* ================= END SESSION + LOG ================= */
-
-function endSession(device) {
+window.endSession = function (device) {
   const s = sessions[device];
-  if (!s) return;
-
   const endTime = new Date();
-  const playedMinutes = Math.round((s.totalSeconds - s.remaining) / 60);
 
-  const log = {
+  logs.push({
     date: endTime.toLocaleDateString(),
-    device: device,
+    device,
     customer: s.customer,
     players: s.players,
     startTime: s.startTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
     endTime: endTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
-    minutes: playedMinutes,
+    minutes: Math.round((s.totalSeconds - s.remaining) / 60),
     amount: s.amount,
     paid: s.paid ? "Yes" : "No"
-  };
+  });
 
-  logs.push(log);
   localStorage.setItem("levelUpLogs", JSON.stringify(logs));
-
   delete sessions[device];
   document.getElementById(device).remove();
-}
+};
 
-/* ================= TIMER LOOP ================= */
+/* ================= TIMER ================= */
 
 setInterval(() => {
-  for (let device in sessions) {
-    const s = sessions[device];
-    const div = document.getElementById(device);
+  for (let d in sessions) {
+    const s = sessions[d];
+    const div = document.getElementById(d);
 
-    if (s.running && s.remaining > 0) {
-      s.remaining--;
-    }
-
-    const min = Math.floor(s.remaining / 60);
-    const sec = s.remaining % 60;
+    if (s.running && s.remaining > 0) s.remaining--;
 
     div.querySelector(".time").innerText =
-      s.remaining > 0
-        ? `⏳ ${min}m ${sec}s remaining`
-        : "⛔ Time Over";
+      s.remaining > 0 ? `⏳ ${Math.floor(s.remaining/60)}m ${s.remaining%60}s` : "⛔ Time Over";
 
     div.querySelector(".endTime").innerText =
-      s.remaining > 0
-        ? `⏰ Ends at: ${formatEndTime(s.remaining)}`
-        : "";
-
-    if (s.remaining <= 0) {
-      div.classList.add("expired");
-    }
+      s.remaining > 0 ? `⏰ Ends at: ${new Date(Date.now()+s.remaining*1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}` : "";
   }
 }, 1000);
 
-/* ================= DAILY LOG ================= */
+/* ================= LOG UI ================= */
 
-function showTodayLog() {
+window.showTodayLog = function () {
   const today = new Date().toLocaleDateString();
   const todayLogs = logs.filter(l => l.date === today);
 
   let total = 0;
-  let html = `
-    <h3>📜 Today’s Log</h3>
-    <table border="1" cellpadding="5" style="margin:auto;">
-      <tr>
-        <th>Device</th>
-        <th>Customer</th>
-        <th>Players</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Minutes</th>
-        <th>Amount</th>
-        <th>Paid</th>
-      </tr>
-  `;
+  let html = `<h3>📜 Today’s Log</h3><table><tr>
+  <th>Device</th><th>Customer</th><th>Players</th><th>Start</th><th>End</th><th>Min</th><th>₹</th><th>Paid</th></tr>`;
 
   todayLogs.forEach(l => {
     total += Number(l.amount);
-    html += `
-      <tr>
-        <td>${l.device}</td>
-        <td>${l.customer}</td>
-        <td>${l.players}</td>
-        <td>${l.startTime}</td>
-        <td>${l.endTime}</td>
-        <td>${l.minutes}</td>
-        <td>₹${l.amount}</td>
-        <td>${l.paid}</td>
-      </tr>
-    `;
+    html += `<tr><td>${l.device}</td><td>${l.customer}</td><td>${l.players}</td>
+    <td>${l.startTime}</td><td>${l.endTime}</td><td>${l.minutes}</td><td>${l.amount}</td><td>${l.paid}</td></tr>`;
   });
 
-  html += `
-    </table>
-    <h4>💰 Total: ₹${total}</h4>
-  `;
-
+  html += `</table><h4>Total: ₹${total}</h4>`;
   document.getElementById("logArea").innerHTML = html;
   document.getElementById("logArea").style.display = "block";
-}
+};
 
-function closeLog() {
-  const logArea = document.getElementById("logArea");
-  logArea.style.display = "none";
-  logArea.innerHTML = "";
-}
-
-function downloadLog() {
-  if (logs.length === 0) {
-    alert("No logs available");
-    return;
-  }
-
+window.downloadLog = function () {
   let csv = "Date,Device,Customer,Players,Start,End,Minutes,Amount,Paid\n";
+  logs.forEach(l => csv += Object.values(l).join(",") + "\n");
 
-  logs
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
+  a.download = "LevelUpGaming_Log.csv";
+  a.click();
+};
+
+});

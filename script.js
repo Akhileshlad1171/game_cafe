@@ -146,9 +146,12 @@ window.showTodayLog = function () {
   const todayLogs = logs.filter(l => l.date === today);
 
   let total = 0;
-  let html = `<h3>📜 Today’s Log</h3><table><tr>
-    <th>Device</th><th>Customer</th><th>Players</th><th>Start</th>
-    <th>End</th><th>Min</th><th>₹</th><th>Paid</th></tr>`;
+  let html = `<h3 style="text-align:center;">📜 Today’s Log</h3>
+  <table style="margin:0 auto; width:95%; text-align:center;">
+    <tr>
+      <th>Device</th><th>Customer</th><th>Players</th>
+      <th>Start</th><th>End</th><th>Min</th><th>₹</th><th>Paid</th>
+    </tr>`;
 
   todayLogs.forEach(l => {
     total += Number(l.amount);
@@ -164,10 +167,14 @@ window.showTodayLog = function () {
     </tr>`;
   });
 
-  html += `</table><h4>Total: ₹${total}</h4>`;
-  document.getElementById("logArea").innerHTML = html;
-  document.getElementById("logArea").style.display = "block";
+  html += `</table><h4 style="text-align:center;">💰 Total: ₹${total}</h4>`;
+
+  const logArea = document.getElementById("logArea");
+  logArea.innerHTML = html;
+  logArea.style.display = "block";
 };
+
+/* ================= DOWNLOAD ================= */
 
 window.downloadLog = function () {
   if (logs.length === 0) {
@@ -184,17 +191,18 @@ window.downloadLog = function () {
   a.click();
 };
 
-/* 🔥 NEW FEATURE: CLEAR LOG */
+/* ================= CLEAR LOG (FIXED) ================= */
+
 window.clearLog = function () {
   if (!confirm("Are you sure you want to clear ALL today's logs?")) return;
 
   logs = [];
-  localStorage.removeItem("levelUpLogs");
+  localStorage.setItem("levelUpLogs", JSON.stringify([])); // 🔥 FIX
 
   const logArea = document.getElementById("logArea");
   logArea.innerHTML = `
-    <h3 style="color:#22c55e;">🧹 Logs Cleared</h3>
-    <p>No records for today.</p>
+    <h3 style="color:#22c55e; text-align:center;">🧹 Logs Cleared</h3>
+    <p style="text-align:center;">No records for today.</p>
   `;
   logArea.style.display = "block";
 };
